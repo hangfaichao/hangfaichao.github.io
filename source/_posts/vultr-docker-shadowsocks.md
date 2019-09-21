@@ -2,6 +2,7 @@
 title: vultr+docker+shadowsocks
 date: 2018-11-10 14:53:26
 tags:
+categories: VPN
 ---
 
 ## vultr

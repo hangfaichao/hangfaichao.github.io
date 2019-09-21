@@ -3,7 +3,7 @@ title: Linux配置Shadowsocks客户端
 date: 2018-10-27 13:39:01
 tags:
 - 科学上网
-categories:  
+categories: VPN
 ---
 
 参考博客  [Linux安装配置Shadowsocks客户端及开机自动启动](https://blog.huihut.com/2017/08/25/LinuxInstallConfigShadowsocksClient/)  
