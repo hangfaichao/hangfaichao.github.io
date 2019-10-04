@@ -1,7 +1,7 @@
 ---
 title: JAVA垃圾收集与内存分配
 date: 2019-09-21 09:57:51
-tags: JAVA, GC
+tags: GC
 category: JVM
 ---
 

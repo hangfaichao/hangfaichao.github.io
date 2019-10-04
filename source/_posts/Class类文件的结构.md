@@ -1,7 +1,7 @@
 ---
 title: Class类文件的结构
 date: 2019-09-27 10:39:02
-tags: JAVA
+tags: 
 category: JVM
 ---
 

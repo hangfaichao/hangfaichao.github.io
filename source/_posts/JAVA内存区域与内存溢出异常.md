@@ -1,7 +1,7 @@
 ---
 title: JAVA内存区域与内存溢出异常
 date: 2019-09-21 10:04:35
-tags: JAVA
+tags:
 category: JVM
 ---
 
