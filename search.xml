@@ -1,6 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[Redis数据结构与对象]]></title>
+    <url>%2F2019%2F12%2F24%2FRedis%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E5%AF%B9%E8%B1%A1%2F</url>
+    <content type="text"><![CDATA[简单动态字符串Redis使用一个抽象类型来保存字符串，称为简单动态字符串（SDS）。 每个sds.h/sdshdr结构表示一个SDS值： 12345678struct sdshdr &#123; // 记录buf数组中已经使用字节的数量，也就是字符串的长度 int len; // 记录buf数组中未使用子节的数量 int free; // 字节数组，用于保存字符串 char buf[];&#125; SDS与C字符串的区别： C：获取字符串长度的复杂度为O(N)，SDS获取字符串长度的复杂度为O(1)。 C：API不安全，可能会造成缓冲区溢出，SDS：API是安全的，不会造成缓冲区溢出。 C：修改字符串长度N次必然执行N次内存重分配，SDS：修改字符串长度N次最多执行N次内存重分配 C：只能保存文本数据，SDS：可以保存二进制数据 C：可以使用所有库中的函数，SDS：可以使用一部分库中的函数。]]></content>
+      <categories>
+        <category>Redis</category>
+      </categories>
+  </entry>
+  <entry>
+    <title><![CDATA[动态规划问题]]></title>
+    <url>%2F2019%2F12%2F11%2F%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92%E9%97%AE%E9%A2%98%2F</url>
+    <content type="text"><![CDATA[动态规划问题的思想：找到一个递归式，将大问题转化为小问题。从最小的问题开始，记住每一次的答案，从而在解决大的问题的时候减少重复计算。提升算法效率。 几个动态规划经典问题：最长回文子串、最长回文子序列、最长公共子串、背包问题。 最长回文子串回文是指正向反向相同，子串是指连续的字符。例如”abacba”的最长回文子串是”aba”。 dp[i, j] = 1/0 表示下标从i到j的子串是/否为回文串。 递归式： 12dp[i, j] = dp[i + 1, j - 1], str[i] == str[j] = 0 , str[i] != str[j] Java代码： 12345678910111213141516171819class Solution &#123; public String longestPalindrome(String s) &#123; int n = s.length(); int maxLen = 0; boolean[][] dp = new boolean[n][n]; String res = ""; for (int i = n - 1; i &gt;= 0; i--) &#123; for (int j = i; j &lt; n; j++) &#123; dp[i][j] = (s.charAt(i) == s.charAt(j)) &amp;&amp; (j - i &lt; 3 || dp[i + 1][j - 1]); if (dp[i][j] &amp;&amp; j - i + 1 &gt; maxLen) &#123; maxLen = j - i + 1; res = s.substring(i, j + 1); &#125; &#125; &#125; return res; &#125;&#125; 最长回文子序列子序列跟子串的区别是不连续。 用dp[i, j]表示下标i到j的子串的最长回文串的长度。 递归式： 12dp[i, j] = dp[i + 1, j - 1] + 2 , str[i] == str[j] = max(dp[i + 1, j], dp[i, j - 1]), str[i] != str[j] Java代码： 123456789101112131415161718class Solution &#123; public int longestPalindromeSubseq(String s) &#123; int n = s.length(); int[][] dp = new int[n][n]; for (int i = n - 1; i &gt;= 0; i--) &#123; dp[i][i] = 1; for (int j = i + 1; j &lt; n; j++) &#123; if (s.charAt(i) == s.charAt(j)) &#123; dp[i][j] = dp[i + 1][j - 1] + 2; &#125; else &#123; dp[i][j] = Math.max(dp[i + 1][j], dp[i][j - 1]); &#125; &#125; &#125; return dp[0][n-1]; &#125;&#125; 最长公共子序列用dp[i, j]表示下标i到j的子串的最长回文串的长度。 递归式： 12dp[i, j] = dp[i -1 1, j - 1] + 1 , str[i] == str[j] = max(dp[i - 1, j], dp[i, j - 1]) , str[i] != str[j] Java代码： 12345678910111213141516171819class Solution &#123; public int longestCommonSubsequence(String text1, String text2) &#123; int m = text1.length(), n = text2.length(); int[][] dp = new int[m + 1][n + 1]; for (int i = 0; i &lt;= m; i++) &#123; dp[i][0] = 0; &#125; for (int j = 1; j &lt;= n; j++) &#123; dp[0][j] = 0; &#125; for (int i = 1; i &lt;= m; i++) &#123; for (int j = 1; j &lt;= n; j++) &#123; if (text1.charAt(i - 1) == text2.charAt(j - 1)) dp[i][j] = dp[i - 1][j - 1] + 1; else dp[i][j] = Math.max(dp[i][j - 1], dp[i - 1][j]); &#125; &#125; return dp[m][n]; &#125;&#125;]]></content>
+      <categories>
+        <category>Algorithm</category>
+      </categories>
+      <tags>
+        <tag>dp</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[开始准备找工作！]]></title>
     <url>%2F2019%2F11%2F28%2F%E5%BC%80%E5%A7%8B%E5%87%86%E5%A4%87%E6%89%BE%E5%B7%A5%E4%BD%9C%EF%BC%81%2F</url>
     <content type="text"><![CDATA[最近跟大学同学聊了聊，发现已经拿到阿里的offer了。忽然觉得自己太混了，研究生快一年半了，细细想来，并没有学到什么，收获什么。痛定思痛，决定立个flag！今天开始！开始好好准备找工作！这里立一个计划！ 目标：阿里、头条的Java开发或者大数据开发岗位 （另外还存在侥幸心理，能不能去到知名公司的算法岗，做一个知识图谱算法工程师，这个就不列在这里了，科研的方向就是这个，顺其自然吧，不着重准备了） 好的重新列计划：（参考牛客分享） 目标岗位：阿里或头条的Java开发或大数据开发 每日计划：每天刷题3道题目（leetcode或牛客） 分段计划： Java Java基础：《Java编程思想》 Java提高：《深入理解java虚拟机》、《Java高并发程序设计》、《大话设计模式》、JDK部分源码 数据库：《MySQL必知必会》、《MySQL技术内幕：InnoDB存储引擎》 缓存： 《Redis设计与实现》 计算机基础：《现代操作系统》、《图解TCP/IP》、《鸟哥Linux私房菜：基础篇》 架构：《大型网站技术架构》 大数据 Hadoop:《Hadoop权威指南》、《Hadoop技术内幕：Yarn》、《Hadoop 2.X HDFS源码剖析》 分布式协议：《从paxos到zookeeper分布式一致性协议》 流计算：《Spark大数据处理技术》、《Storm分布式实时计算模式》、《Flink官网https://flink.apache.org/》 非关系型数据库：《HBase权威指南》 消息队列：《Kafka权威指南》、《Kafka官网http://kafka.apache.org/》 wocao这么多书…这怎么看得完orz。半个月一本书也得看一年，而我只剩下…最多四个月找实习的时间。 忽然感觉无从下手…已经没办法做规划了… 《Java编程思想》就先放着，一些基础的碰到没接触过的查资料就好了，《深入理解java虚拟机》看过大部分了，也在这个主页做了部分笔记，只是现在又忘差不多了，这个也先放放吧，看到《MySQL必知必会》系图书馆还在架，先从这个看起吧。 争取半个月看完！]]></content>
