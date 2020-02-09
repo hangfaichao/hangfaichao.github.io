@@ -174,3 +174,122 @@ rehash步骤为：
 3）在rehash进行期间，每次对字典执行添加、删除、查找或者更新操作时，程序除了执行指定的操作外，顺带将ht[0]在rehashidx索引上的所有键值对rehash到ht[1]，并将rehashidx加一
 
 4）所有键值对迁移完成后，rehashidx设为-1
+
+# 跳跃表
+
+跳跃表支持平均O(logN)、最坏O(N)复杂度的节点查找，还可以通过顺序性操作来批量处理节点。
+
+## 跳跃表节点
+
+redis.h/zskiplistNode
+
+```c
+typedef struct zskiplistNode {
+   // 层
+    struct zskiplistLevel {
+        // 前进指针
+        struct zskiplistNode *forward;
+        // 跨度
+        unsigned int span;
+    } level[];
+    // 后退指针
+    struct zskiplistNode *backward;
+    // 分值
+    double score;
+    // 成员对象
+    robj *obj;
+} zskiplistNode;
+```
+
+## 跳跃表
+
+redis.h/zskiplist
+
+```c
+typedef struct zskiplist {
+    // 表头节点和表尾节点
+    struct zskiplistNode *header, *tail;
+    // 表中节点的数量
+    unsigned long length;
+    // 表中层数最大的节点的层数
+    int level;
+} zskiplist;
+```
+
+# 整数集合
+
+整数集合时集合键的底层实现之一，当一个集合只包含整数值元素，并且这个集合的元素数量不多时，Redis就会使用整数集合作为集合键的底层实现。
+
+## 整数集合的实现
+
+intset.h/intset
+
+```c
+typedef struct intset {
+    // 编码方式
+    uint32_t encoding;
+    //集合包含的元素数量
+    uint32_t length;
+    //保存元素的数组
+    int8_t contents[];
+}
+```
+
+## 升级
+
+当要添加的新元素比整数集合现有所有元素的类型都要长时，需要对整数集合进行升级，才能将新元素添加到整数集合里。
+
+升级整数集合并添加新元素共分为三步进行：
+
+- 根据新元素的类型，扩展整数集合底层数组的空间大小，并为新元素分配空间。
+- 将底层数组现有的所有元素都转换为新元素相同的类型，并放置到正确的位置上，且保持有序性不变。
+- 将新元素添加到底层数组里面。
+
+# 压缩列表
+
+压缩列表是列表键和哈希键的底层实现之一。
+
+## 压缩列表的构成
+
+压缩列表的各个组成部分：
+
+- zlbytes：记录整个压缩列表占用的内存字节数
+- zltail：记录压缩列表表尾节点距离起始地址有多少字节
+- zllen：记录压缩列表包含的节点数量
+- entryX：压缩列表的各个节点
+- zlend：特殊值0xFF（十进制255），用于标记压缩列表的末端
+
+## 压缩列表节点的构成
+
+每个压缩列表节点可以保存一个字节数组或者一个整数值。每个节点都由previous_entry_length、encoding、content三个部分组成
+
+# 对象
+
+Redis并没有直接使用前面的数据结构来实现键值对数据库，而是基于这些数据结构创建了一个对象系统，这个系统包含字符串对象、列表对象、哈希对象、集合对象和有序集合对象这五种类型的对象，每个对象都用到了至少一种我们前面所介绍的数据结构。
+
+## 对象的类型与编码
+
+每次当我们在Redis的数据库中新创建一个键值对时，我们至少会创建两个对象：键对象和值对象。
+
+Redis中的每个对象都由一个redisObject结构表示，该结构中和保存数据有关的三个属性分别是type属性、encoding属性和ptr属性：
+
+```c
+typedef struct redisObject {
+    \\ 类型
+	unsigned type:4;
+    \\ 编码
+    unsigned encoding:4;
+    \\ 指向底层实现数据结构的指针
+    void *ptr;
+    \\ ...
+} robj;
+```
+
+### 类型
+
+对象的type属性记录了对象的类型，这个属性的值可以是REDIS_STRING、REDIS_LIST、REDIS_HASH、REDIS_SET、REDIS_ZSET
+
+### 编码和底层实现
+
+对象的ptr指针指向对象的底层实现数据结构，而这些数据结构由对象的encoding属性决定。
+
