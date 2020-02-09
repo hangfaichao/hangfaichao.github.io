@@ -86,7 +86,7 @@
 <meta property="og:site_name" content="hangfaichao">
 <meta property="og:description" content="操作系统1 进程与线程的区别进程：  资源分配的最小单位 进程有独立的寻址空间，建立和切换进程代价昂贵。每建立一个进程，系统就会为这个进程分配地址空间，建立数据表来维护代码段、堆栈段和数据段。 进程之间的通信需要以通信的方式（IPC）进行 多进程程序更加健壮。进程地址空间独立，一个进程死掉不会影响其他进程。  线程：  资源调度的最小单元（程序运行的最小单元） 同一个进程中的线程可以共享数据，新建">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2020-02-08T11:45:55.734Z">
+<meta property="og:updated_time" content="2020-02-09T14:01:45.479Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="实习面经总结">
 <meta name="twitter:description" content="操作系统1 进程与线程的区别进程：  资源分配的最小单位 进程有独立的寻址空间，建立和切换进程代价昂贵。每建立一个进程，系统就会为这个进程分配地址空间，建立数据表来维护代码段、堆栈段和数据段。 进程之间的通信需要以通信的方式（IPC）进行 多进程程序更加健壮。进程地址空间独立，一个进程死掉不会影响其他进程。  线程：  资源调度的最小单元（程序运行的最小单元） 同一个进程中的线程可以共享数据，新建">
@@ -454,14 +454,71 @@
 <p>栈：是线程独有的。保存线程运行状态和局部自动变量的。栈在线程开始的时候初始化，每个线程的栈相互独立，操作系统在切换线程的时候会自动切换栈，就是切换SS/ESP寄存器，栈空间不需要在高级语言里面显示的分配和释放。</p>
 <p>线程共享：地址空间、全局变量、打开的文件、子进程、闹铃、信号及信号服务程序、记账信息</p>
 <p>线程独享：程序计数器、寄存器、栈、状态字</p>
-<h4 id="6-操作系统内存管理方式，分页分段以及段页式的优缺点"><a href="#6-操作系统内存管理方式，分页分段以及段页式的优缺点" class="headerlink" title="6 操作系统内存管理方式，分页分段以及段页式的优缺点"></a>6 操作系统内存管理方式，分页分段以及段页式的优缺点</h4><h4 id="7-页面置换算法有哪些，-FIFO为什么不好？如何改进？LRU思想，手写LRU"><a href="#7-页面置换算法有哪些，-FIFO为什么不好？如何改进？LRU思想，手写LRU" class="headerlink" title="7 页面置换算法有哪些， FIFO为什么不好？如何改进？LRU思想，手写LRU"></a>7 页面置换算法有哪些， FIFO为什么不好？如何改进？LRU思想，手写LRU</h4><p>1）最佳置换算法（OPT）：优先淘汰永远不被访问或者最长时间内不被访问的页面</p>
+<h4 id="6-操作系统内存管理方式，分页分段以及段页式的优缺点"><a href="#6-操作系统内存管理方式，分页分段以及段页式的优缺点" class="headerlink" title="6 操作系统内存管理方式，分页分段以及段页式的优缺点"></a>6 操作系统内存管理方式，分页分段以及段页式的优缺点</h4><p>虚拟地址、物理地址</p>
+<p>base和limit寄存器：保证隔离性</p>
+<p>内存管理单元（MMU）：进行虚拟内存到物理内存的映射和保护</p>
+<p>动态加载、动态链接库：类似模块化思想，有些程序例如print()函数在内存中只存在一份，多个进程可以使用它</p>
+<p>连续分配</p>
+<p>进程放到哪一块空闲内存中：首次适应（用得最多）算法、下次适应、最佳适应、最差适应</p>
+<p>现代操作系统不是连续分配，但上述算法可以适用在堆空间的分配上。</p>
+<p>页式管理不是连续分配，物理空间、逻辑空间都不连续。</p>
+<p>页式管理没有外部碎片，利用页表，页表可以使用分级链表、哈希表+链表、反表（物理内存的页表号-&gt;[进程ID+虚拟页号]）的数据结构来控制页表大小</p>
+<p>页的大小总是2的整数次幂，选择页的大小为2的幂可以方便地将逻辑地址转换为页号和页偏移。如果逻辑地址空间为2^m，且页大小为2^n，那么逻辑地址的<strong>高m-n位表示页号</strong>，而<strong>低n位表示页偏移</strong>。页面越小，内部碎片越小，但是页表越大；页面越大，内部碎片越大，但是页表越小。</p>
+<p>增加页表之后访问内存变成两次（一次查页表一次访问真正的物理内存）。利用快表（一个cache）提高速度。快表可以利用硬件进行并行查找页面号。</p>
+<p>页式：</p>
+<p>优点：没有外碎片，每个内碎片不超过页的大小。</p>
+<p>缺点：程序全部装入内存，要求有相应的硬件支持，如地址变换机构缺页中断的产生和选择淘汰页面等都要求有相应的硬件支持。增加了机器成本和系统开销。</p>
+<p>段式：</p>
+<p>优点：可以充分实现共享和保护，便于动态申请内存，管理和使用统一化，便于动态链接</p>
+<p>缺点：会产生碎片。</p>
+<p>段页式：</p>
+<p>优点：具有两者的优点。</p>
+<p>缺点：由于管理软件的增加，复杂性和开销也增加。另外需要的硬件以及占用的内存也有所增加，使得执行速度下降。</p>
+<p><a href="https://www.zhihu.com/question/50796850" target="_blank" rel="noopener">参考知乎</a>，<a href="https://www.bilibili.com/video/av11441024?p=39" target="_blank" rel="noopener">B站操作系统，内存管理：37-48</a>，<a href="https://blog.csdn.net/smilesundream/article/details/70148878" target="_blank" rel="noopener">CSDN</a></p>
+<h4 id="7-页面置换算法有哪些，-FIFO为什么不好？如何改进？LRU思想，手写LRU"><a href="#7-页面置换算法有哪些，-FIFO为什么不好？如何改进？LRU思想，手写LRU" class="headerlink" title="7 页面置换算法有哪些， FIFO为什么不好？如何改进？LRU思想，手写LRU"></a>7 页面置换算法有哪些， FIFO为什么不好？如何改进？LRU思想，手写LRU</h4><p>1）最佳置换算法（OPT）：优先淘汰永远不被访问或者最长时间内不被访问的页面</p>
 <p>2）先进先出算法（FIFO）：优先淘汰最早进入内存的页面</p>
 <p>FIFO算法基于队列实现，只有FIFO算法会出现Belady现象，即内存中的物理块数量增加时，缺页率可能不减反增。</p>
 <p>3）最近最久未使用算法（LRU）：优先淘汰最近最长时间未被访问过的页面</p>
 <p>LRU是堆栈类算法，是“向前看”的，而OPT是“向后看”的。LRU算法性能较好，但是需要寄存器和栈的硬件支持。理论上可以证明，堆栈类算法不可能出现Belady现象。</p>
+<p>实现：</p>
+<ul>
+<li>使用数组+计数器：给CPU增加一个逻辑时钟或者计数器，每次存储访问，就把计数器加1。这样记下每个页面最后一次被访问的时间。缺点是1.插入数据、删除数据以及访问数据时，时间复杂度都是O(n)。2.时钟值会溢出。</li>
+<li>使用链表：每访问一个页面，就将这个页面放到表尾，每次置换表头的页面。缺点是访问数据时复杂度为O(n)。</li>
+<li>使用链表+HashMap</li>
+</ul>
 <p>4）时钟置换算法（CLOCK），又称为最近未用算法（NRU）：优先淘汰最近未使用算法</p>
 <p>实现：给每个页面关联一个使用位。首次装入内存时，使用位置为1；随后被访问到时，使用位也置为1。使用一个循环缓冲区保存这些页面和使用位，一个指针扫描这个缓冲区。当指针指向的页面使用位为0是置换出去，否则将指向的页面的使用位置为0。</p>
-<p><a href="https://blog.csdn.net/huyang0304/article/details/82694526" target="_blank" rel="noopener">参考</a></p>
+<p><a href="https://blog.csdn.net/huyang0304/article/details/82694526" target="_blank" rel="noopener">参考</a>，<a href="https://blog.csdn.net/elricboa/article/details/78847305" target="_blank" rel="noopener">LRU实现</a></p>
+<h4 id="8-死锁条件和解决方式"><a href="#8-死锁条件和解决方式" class="headerlink" title="8 死锁条件和解决方式"></a>8 死锁条件和解决方式</h4><p>8.1 什么是死锁</p>
+<p>多个进程因为竞争资源而互相造成的一种僵局，若无外力作用，这些进程都将无法推进。</p>
+<p>8.2 产生死锁的原因</p>
+<p>1）系统资源的竞争</p>
+<p>2）进程运行推进顺序不当</p>
+<p>8.3 死锁的四个必要条件</p>
+<p>1）互斥条件：一个资源只能被一个进程使用，即在一段时间内，某资源仅被一个进程所占有</p>
+<p>2）占有且等待条件：进程已经保持了至少一个资源，又对提出了资源请求，而另一个资源已经被其他进程占有，此时，请求进程被阻塞，而对自己占有的资源保持不放</p>
+<p>3）不可抢占条件：进程所占有的资源在使用完毕之前不可以被其他进程强行夺走</p>
+<p>4）循环等待条件：若干进程形成首尾相连循环等待资源的关系</p>
+<p>8.4 避免死锁的办法</p>
+<p>1）预防 — 确保系统不会进入死锁状态</p>
+<p>a. 破坏“占有且等待”条件</p>
+<p>方法一：所有进程在开始运行之前，必须一次性申请其运行过程中所需要的全部资源</p>
+<p>​    优点：简单易行且安全</p>
+<p>​    缺点：造成资源浪费，使进程经常发生饥饿现象</p>
+<p>方法二：允许进程只获得运行初期所需要的资源就开始运行，运行过程中逐步释放掉使用完毕的资源再申请新的资源</p>
+<p>b. 破坏“不可抢占”条件</p>
+<p>在进程申请新资源被阻塞时，必须释放自己拥有的所有资源，以后需要使用的时候再申请。</p>
+<p>缺点：实现复杂，影响进程工作效率，同时反复请求和释放资源会延长进程的进度，影响系统的吞吐量</p>
+<p>c. 破坏循环等待条件</p>
+<p>给每个资源编号，当一个进程占有资源i时，下一次只能申请编号大于i的资源。</p>
+<p>缺点：低效，资源可能没有被其他进程所占有，但是却无法被进程申请得到。</p>
+<p>2）避免 — 在使用资源之前进行判断</p>
+<p>如果一个进程的请求会导致死锁就不启动该进程，如果一个进程增加资源的请求会导致死锁就拒绝该请求。</p>
+<p>具体实现通常采用<strong><em>银行家算法</em></strong>。</p>
+<p>3）检测与解除</p>
+<p>检测：检测算法&lt;&lt;&lt;&lt;待解决&lt;&lt;&lt;&lt;</p>
+<p>解除：抢占资源、终止进程（可根据进程优先级、已运行时间、还需运行时间、已占用资源等）</p>
+<p><a href="https://blog.csdn.net/guaiguaihenguai/article/details/80303835" target="_blank" rel="noopener">参考</a></p>
 
       
     </div>
@@ -626,7 +683,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#操作系统"><span class="nav-number">1.</span> <span class="nav-text">操作系统</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-进程与线程的区别"><span class="nav-number">1.0.0.1.</span> <span class="nav-text">1 进程与线程的区别</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-什么是协程"><span class="nav-number">1.0.0.2.</span> <span class="nav-text">2 什么是协程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-进程间通信方式（IPC）"><span class="nav-number">1.0.0.3.</span> <span class="nav-text">3 进程间通信方式（IPC）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-用户态和内核态"><span class="nav-number">1.0.0.4.</span> <span class="nav-text">4 用户态和内核态</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-进程中的堆和栈，线程共享进程的哪些资源"><span class="nav-number">1.0.0.5.</span> <span class="nav-text">5 进程中的堆和栈，线程共享进程的哪些资源</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-操作系统内存管理方式，分页分段以及段页式的优缺点"><span class="nav-number">1.0.0.6.</span> <span class="nav-text">6 操作系统内存管理方式，分页分段以及段页式的优缺点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#7-页面置换算法有哪些，-FIFO为什么不好？如何改进？LRU思想，手写LRU"><span class="nav-number">1.0.0.7.</span> <span class="nav-text">7 页面置换算法有哪些， FIFO为什么不好？如何改进？LRU思想，手写LRU</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#操作系统"><span class="nav-number">1.</span> <span class="nav-text">操作系统</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-进程与线程的区别"><span class="nav-number">1.0.0.1.</span> <span class="nav-text">1 进程与线程的区别</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-什么是协程"><span class="nav-number">1.0.0.2.</span> <span class="nav-text">2 什么是协程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-进程间通信方式（IPC）"><span class="nav-number">1.0.0.3.</span> <span class="nav-text">3 进程间通信方式（IPC）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-用户态和内核态"><span class="nav-number">1.0.0.4.</span> <span class="nav-text">4 用户态和内核态</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-进程中的堆和栈，线程共享进程的哪些资源"><span class="nav-number">1.0.0.5.</span> <span class="nav-text">5 进程中的堆和栈，线程共享进程的哪些资源</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-操作系统内存管理方式，分页分段以及段页式的优缺点"><span class="nav-number">1.0.0.6.</span> <span class="nav-text">6 操作系统内存管理方式，分页分段以及段页式的优缺点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#7-页面置换算法有哪些，-FIFO为什么不好？如何改进？LRU思想，手写LRU"><span class="nav-number">1.0.0.7.</span> <span class="nav-text">7 页面置换算法有哪些， FIFO为什么不好？如何改进？LRU思想，手写LRU</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#8-死锁条件和解决方式"><span class="nav-number">1.0.0.8.</span> <span class="nav-text">8 死锁条件和解决方式</span></a></li></ol></li></ol></div>
             
 
           </div>
