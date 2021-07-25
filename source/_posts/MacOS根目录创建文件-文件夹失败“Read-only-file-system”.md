@@ -36,7 +36,7 @@ sudo touch test
 2、在`\etc\synthetic.conf`文件（如果没有则创建）中输入以下内容（注意中间是tab键：
 
 ```
-app		/Users/zhh/app
+app	/Users/zhh/app
 data	/Users/zhh/data
 ```
 
